@@ -1,130 +1,128 @@
-# Pathway — Job Application Tracker
+# Pathway - Job Application Tracker
 
-This is my submission for the Mini Hackathon. It's a job application
-tracker — basically a board where I can see every job I've applied to,
-what stage it's at, and whether I need to follow up on something.
+Ye mera submission hai Mini Hackathon ke liye. Basically ek job application
+tracker hai - ek board jaisa jaha pe main dekh sakta hu maine kaha kaha apply
+kiya hai, kaunsa stage chal raha hai, aur kaha follow up karna bhool gaya
+(jo ki bahot baar hota hai lol).
 
-## Why I picked this project
+## Ye project hi kyun banaya
 
-We hadn't started Redux Toolkit yet, so the challenge was to pick
-something using what we'd already covered — JS, DOM, React, Context
-API, React Router, Forms, Git/GitHub — and build it mostly on my own by
-reading docs instead of following a tutorial video.
+Humari class me abhi tak Redux Toolkit nahi padhaya tha, to hackathon ka idea
+ye tha ki jo already pata hai usi se koi cheez akele banao - JS, DOM, React,
+Context API, React Router, Forms, Git/GitHub - tutorial follow kiye bina, docs
+padh padh ke.
 
-I'm actually applying to jobs right now, and I kept losing track of
-which company I was talking to and what round I was in, so I picked
-something I'd genuinely use instead of a random todo-list clone.
+Aur waise bhi main abhi actually jobs ke liye apply kar raha hu aur bhul jata
+tha ki kisse baat hui thi aur kaunsa round chal raha tha,  isliye ek aur
+todo-list clone banane ki jagah maine wo cheez banayi jo mujhe khud kaam aaye.
 
-## What I had to figure out on my own
+## Jo cheeze khud se figure out karni padi
 
-A few things I didn't fully remember from class and had to go check
-the actual docs for:
+Kuch cheeze class me thik se cover nahi hui thi to docs padhne pade ya bas try
+karte karte samjha:
 
-- **Context API** — I remembered the basic idea (avoid passing props
-  down manually) but I wasn't sure how to structure a provider that
-  also handles CRUD functions, not just plain state. I ended up
-  reading through the React docs on `useContext` again and looked at
-  a couple of examples before it clicked. I also realised partway
-  through that cramming *everything* into one context (both app data
-  and theme) was getting messy, so I split it into two separate
-  contexts instead — one for the applications, one just for
-  dark/light mode.
-- **React Router `useParams`** — for the edit page, I needed to know
-  *which* application to show based on the URL. I'd used basic routes
-  in class but not a dynamic route like `/edit/:id`. Had to check the
-  React Router docs for how `useParams()` actually pulls that out.
-- **localStorage** — this wasn't covered in class at all. I wanted the
-  data to not disappear on refresh, but I didn't want to set up a
-  whole backend for a hackathon project, so I looked up how
-  `localStorage.setItem` / `getItem` work and wired it up with a
-  `useEffect` that saves every time the state changes.
-- **Follow-up reminder logic** — this one I came up with myself after
-  the basic version felt too plain. I wanted a way to flag
-  applications I'd forgotten about, so I store a timestamp
-  (`lastUpdated`) every time something changes, and calculate "days
-  since" on the fly whenever the app renders, instead of storing a
-  separate "isStale" flag that could go out of sync.
+- **Context API** - basic idea pata tha (props ko 10 level neeche pass nahi
+  karna padta) but ye nahi pata tha ki provider ke andar add/edit/delete jaisi
+  functions bhi kaise daalein, sirf plain state nahi. useContext ke docs
+  dubara padhe aur kuch examples dekhe. Beech me ek baar sab kuch (app ka data
+  + theme) ek hi context me daal diya tha aur wo bahot messy ho gaya tha to
+  do alag context bana diye - ek applications ke liye, ek sirf dark/light
+  mode ke liye.
+- **useParams (react-router se)** - edit wale page pe pata hona chahiye ki
+  konsi application kholni hai url se (`/edit/:id`). Class me sirf basic
+  routes kiye the, ye wala nahi, to docs check karne pade ki useParams karta
+  kya hai actually.
+- **localStorage** - ye to class me tha hi nahi. Chahta tha ki refresh karne
+  pe data gayab na ho lekin hackathon ke liye backend banane ka time nahi tha,
+  to localStorage.setItem/getItem dhundha aur useEffect ke andar laga diya jo
+  state change hote hi save kar deta hai.
+- **follow up wala feature** (⏰ wala badge) - ye khud ka idea tha kyunki basic
+  version bahot boring lag raha tha. Jab bhi kuch update hota hai ek timestamp
+  save kar deta hu (lastUpdated), aur phir page render hote waqt "kitne din ho
+  gaye" nikaal leta hu, alag se koi isStale flag rakhne ki jagah jo galat bhi
+  ho sakta tha kabhi.
 
-## What the app actually does
+## Ye app karta kya hai
 
-**Board (home page)** — every application as a card, grouped into
-Applied / Interview / Offer / Rejected columns. There's a search box
-(filter by company or role) and filter chips to hide/show columns.
+- Board (home page) - har application ek card ki tarah, Applied / Interview /
+  Offer / Rejected me group hoke. Search box hai company ya role se dhundhne
+  ke liye, aur chips hai poore column hide/show karne ke liye.
+- Add page - naya application daalne ka form. Company aur role dono zaruri
+  hai, aur ek check laga rakha hai ki job ka link http:// ya https:// se hi
+  start ho warna save hi nahi hoga.
+- Edit page - koi bhi field change kar sakte ho status samet, kitne din ho
+  gaye last touch kiye hue wo dikhata hai aur agar 7+ din ho gaye ho kisi
+  active wale pe to ⏰ warning bhi dikha deta hai (7 din kuch random hi rakha
+  hai, bas thik laga).
+- Stats page - funnel view (applied -> interview -> offer -> rejected)
+  percentage ke sath, aur ek bar chart har stage ka.
+- Theme toggle navbar me, dark/light, jo choose kiya wahi yaad rakhta hai.
 
-**Add page** — a form to log a new application. Company and role are
-required, and I added a check so the job link has to start with
-`http://` or `https://` or it won't save.
+## Class ke concepts kaha use hue
 
-**Edit page** — change any field, including status. Shows how many
-days since it was last touched, and a ⏰ warning if it's been 7+ days
-on an active application (I picked 7 days somewhat arbitrarily — felt
-like a reasonable "you probably forgot about this" threshold).
+Context API context/ApplicationContext.jsx me hai (saara app data + CRUD
+wala) aur context/ThemeContext.jsx me (sirf dark/light mode) - dono alag
+rakhe, apne apne hook ke sath (useApplications(), useTheme()).
 
-**Stats page** — a funnel (applied → interview → offer → rejected)
-with percentages, plus a bar chart per stage.
+React Router zyada tar App.jsx me hai, total 4 routes (/, /add, /edit/:id,
+/stats), edit page pe useParams aur save hone ke baad redirect karne ke liye
+useNavigate.
 
-**Theme toggle** — dark/light switch in the navbar, remembers your
-choice.
+Forms AddApplication.jsx aur EditApplication.jsx me hai, controlled inputs,
+validation onBlur pe chalta hai, error text har field ke niche.
 
-## Concepts from class, and where they show up
-
-| Concept | Where |
-|---|---|
-| Context API | `context/ApplicationContext.jsx` (app data + CRUD) and `context/ThemeContext.jsx` (dark/light mode) — two separate contexts, each with its own hook (`useApplications()`, `useTheme()`) |
-| React Router | `App.jsx` — 4 routes (`/`, `/add`, `/edit/:id`, `/stats`), `useParams` on the edit page, `useNavigate` to redirect after saving |
-| Forms | `AddApplication.jsx` / `EditApplication.jsx` — controlled inputs, validation on blur, inline error messages |
-| useState / useEffect | form state, and syncing both contexts to `localStorage` |
-| useMemo | used on the board to avoid re-filtering the list on every keystroke unless the search term or filters actually change |
+useState/useEffect to lagbhag har jagah hai form state ke liye aur dono
+context ko localStorage me sync karne ke liye. useMemo bhi use kiya board pe
+taki har keystroke pe poori list filter na ho jab tak search term ya filter
+actually change na ho.
 
 ## Project structure
 
 ```
 src/
   context/
-    ApplicationContext.jsx   # applications state, CRUD, localStorage, follow-up logic
-    ThemeContext.jsx          # dark/light mode
+    ApplicationContext.jsx   -> applications ka state, CRUD, localStorage, follow-up wali logic
+    ThemeContext.jsx          -> dark/light mode
   components/
-    Navbar.jsx                 # nav + theme toggle button
-    StageRail.jsx                 # the little progress bar on each card
+    Navbar.jsx                -> nav + theme toggle
+    StageRail.jsx              -> har card pe wo chota progress bar
   pages/
-    Dashboard.jsx                 # board / home page
-    AddApplication.jsx            # add form
-    EditApplication.jsx           # edit + delete form
-    Stats.jsx                      # funnel + bar chart
-    NotFound.jsx                    # 404 page
-  App.jsx                           # routes
-  main.jsx                          # entry point
-  index.css                         # all the styling
+    Dashboard.jsx              -> board / home page
+    AddApplication.jsx         -> add wala form
+    EditApplication.jsx        -> edit + delete wala form
+    Stats.jsx                  -> funnel + bar chart
+    NotFound.jsx                -> 404 page
+  App.jsx                       -> routes
+  main.jsx                      -> entry point
+  index.css                     -> saara css
 ```
 
-## Running it
+## Chalane ke liye
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Deploying (Vercel)
+## Deploy kaise kiya (Vercel pe)
 
-1. Push to a GitHub repo
-2. Import it on vercel.com, framework = Vite
-3. Deploy
+1. github pe push kiya
+2. vercel.com pe import kiya, framework = Vite
+3. deploy
 
-I added a `vercel.json` with a rewrite rule because without it,
-refreshing on a page like `/stats` gave a 404 — took me a bit to
-realize that's a client-side-routing thing and not a bug in my code.
+vercel.json me ek rewrite rule daalna pada kyunki uske bina /stats jaise kisi
+page pe refresh karne pe 404 aa jata tha. Samajhne me time laga ki ye
+client side routing ka issue hai, mera code galat nahi tha.
 
-## What I'd still like to add
+## Aage jo add karna hai time mile to
 
-- A real backend so data syncs across devices instead of being stuck
-  in one browser's localStorage
-- Actual notifications instead of just an in-app badge for follow-ups
-- Export to CSV
+- ek real backend taki data sirf ek browser me hi stuck na rahe
+- asli notifications, abhi to sirf app ke andar ek badge hai
+- csv export - shuru kiya tha, submission tak complete ho ya na ho pata nahi
 
 ## Honest limitations
 
-Right now everything lives in `localStorage`, so if I clear my
-browser data or open the site on my phone, it won't have the same
-applications as my laptop. Good enough for a hackathon, not good
-enough for a real product — that's the tradeoff I made to ship this
-in the time I had.
+Abhi sab kuch localStorage me hi hai. To agar browser data clear kar du ya
+phone pe kholu to laptop wali applications nahi dikhengi. Hackathon ke liye
+thik hai, real product ke liye nahi, lekin jitna time tha usme yehi tradeoff
+lena pada.

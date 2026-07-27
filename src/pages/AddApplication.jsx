@@ -11,14 +11,24 @@ const EMPTY_FORM = {
   notes: "",
 };
 
+// checks the form and returns an object with error messages
+// (empty object means no errors)
 function validate(form) {
   const errors = {};
-  if (!form.company.trim()) errors.company = "Company name is required.";
-  if (!form.role.trim()) errors.role = "Role title is required.";
-  if (!form.appliedDate) errors.appliedDate = "Pick the date you applied.";
+
+  if (!form.company.trim()) {
+    errors.company = "Company name is required.";
+  }
+  if (!form.role.trim()) {
+    errors.role = "Role title is required.";
+  }
+  if (!form.appliedDate) {
+    errors.appliedDate = "Pick the date you applied.";
+  }
   if (form.link.trim() && !/^https?:\/\/.+/i.test(form.link.trim())) {
     errors.link = "Link should start with http:// or https://";
   }
+
   return errors;
 }
 
@@ -44,14 +54,19 @@ export default function AddApplication() {
     setErrors(validationErrors);
     setTouched({ company: true, role: true, appliedDate: true, link: true });
 
-    if (Object.keys(validationErrors).length > 0) return;
+    // agar koi bhi error hai to yahi ruk jao, aage mat badho
+    if (Object.keys(validationErrors).length > 0) {
+      return;
+    }
 
     const id = addApplication({
       ...form,
+      
       company: form.company.trim(),
       role: form.role.trim(),
       link: form.link.trim(),
     });
+
     navigate(`/edit/${id}`);
   }
 
@@ -69,6 +84,7 @@ export default function AddApplication() {
       <form className="form-card" onSubmit={handleSubmit} noValidate>
         <div className="field-row">
           <div className="field-group">
+            
             <label htmlFor="company">Company</label>
             <input
               id="company"
@@ -112,6 +128,7 @@ export default function AddApplication() {
               onBlur={() => handleBlur("appliedDate")}
               className={touched.appliedDate && errors.appliedDate ? "invalid" : ""}
             />
+
             {touched.appliedDate && errors.appliedDate && (
               <div className="error-text">{errors.appliedDate}</div>
             )}
@@ -128,6 +145,7 @@ export default function AddApplication() {
               onBlur={() => handleBlur("link")}
               className={touched.link && errors.link ? "invalid" : ""}
             />
+
             {touched.link && errors.link && (
               <div className="error-text">{errors.link}</div>
             )}
@@ -136,8 +154,11 @@ export default function AddApplication() {
 
         <div className="field-group">
           <label>Current status</label>
+
           <div className="status-picker">
+
             {STAGES.map((stage) => (
+
               <button
                 type="button"
                 key={stage.id}
@@ -158,7 +179,7 @@ export default function AddApplication() {
           <label htmlFor="notes">Notes (optional)</label>
           <textarea
             id="notes"
-            placeholder="Referral from Priya, technical round is DSA + system design..."
+            placeholder="referred by a friend, round 2 was dsa + hr round pending"
             value={form.notes}
             onChange={(e) => handleChange("notes", e.target.value)}
           />

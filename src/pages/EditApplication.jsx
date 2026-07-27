@@ -7,6 +7,8 @@ import {
   needsFollowUp,
 } from "../context/ApplicationContext.jsx";
 
+// same validation function as AddApplication.jsx
+// (should probably move this to a shared file someday but this works for now)
 function validate(form) {
   const errors = {};
   if (!form.company.trim()) errors.company = "Company name is required.";
@@ -21,7 +23,7 @@ function validate(form) {
 export default function EditApplication() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getApplication, updateApplication, deleteApplication } = useApplications();
+  const { getApplication, updateApplication, deleteApplication, addNote } = useApplications();
   const existing = getApplication(id);
 
   const [form, setForm] = useState(
@@ -37,7 +39,9 @@ export default function EditApplication() {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [noteDraft, setNoteDraft] = useState("");
 
+  // agar id galat hai ya application delete ho chuki hai to yaha rok do
   if (!existing) {
     return (
       <div className="empty-state">
@@ -66,7 +70,9 @@ export default function EditApplication() {
     const validationErrors = validate(form);
     setErrors(validationErrors);
     setTouched({ company: true, role: true, appliedDate: true, link: true });
-    if (Object.keys(validationErrors).length > 0) return;
+    if (Object.keys(validationErrors).length > 0) {
+      return;
+    }
 
     updateApplication(id, {
       ...form,
@@ -77,19 +83,43 @@ export default function EditApplication() {
     navigate("/");
   }
 
+  // delete button needs to be clicked twice - first click just asks
+  // for confirmation, second click actually deletes
   function handleDelete() {
     if (!confirmingDelete) {
       setConfirmingDelete(true);
       return;
     }
+
     deleteApplication(id);
     navigate("/");
   }
+
+  function handleAddNote(e) {
+    e.preventDefault();
+    if (!noteDraft.trim()) {
+      return;
+    }
+    addNote(id, noteDraft);
+    setNoteDraft("");
+  }
+
+  function formatTimelineDate(iso) {
+    return new Date(iso).toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  }
+
+  const daysAgo = daysSince(existing.lastUpdated);
 
   return (
     <>
       <div className="page-head">
         <span className="eyebrow">Editing</span>
+
         <h1 className="page-title">
           {existing.role} · {existing.company}
         </h1>
@@ -98,9 +128,9 @@ export default function EditApplication() {
           rushed the application in.
         </p>
         <p className="hint" style={{ marginTop: 10 }}>
-          Last updated {daysSince(existing.lastUpdated) === 0
-            ? "today"
-            : `${daysSince(existing.lastUpdated)} day${daysSince(existing.lastUpdated) === 1 ? "" : "s"} ago`}
+
+          Last updated {daysAgo === 0 ? "today" : `${daysAgo} day${daysAgo === 1 ? "" : "s"} ago`}
+
           {needsFollowUp(existing) && (
             <span style={{ color: "var(--stage-interview)", marginLeft: 8 }}>
               ⏰ Consider following up
@@ -127,6 +157,7 @@ export default function EditApplication() {
           </div>
 
           <div className="field-group">
+
             <label htmlFor="role">Role title</label>
             <input
               id="role"
@@ -145,6 +176,7 @@ export default function EditApplication() {
         <div className="field-row">
           <div className="field-group">
             <label htmlFor="appliedDate">Date applied</label>
+
             <input
               id="appliedDate"
               type="date"
@@ -160,6 +192,7 @@ export default function EditApplication() {
 
           <div className="field-group">
             <label htmlFor="link">Job post link (optional)</label>
+
             <input
               id="link"
               type="url"
@@ -176,6 +209,7 @@ export default function EditApplication() {
 
         <div className="field-group">
           <label>Current status</label>
+
           <div className="status-picker">
             {STAGES.map((stage) => (
               <button
@@ -196,6 +230,7 @@ export default function EditApplication() {
 
         <div className="field-group">
           <label htmlFor="notes">Notes</label>
+
           <textarea
             id="notes"
             value={form.notes}
@@ -220,6 +255,44 @@ export default function EditApplication() {
           </button>
         </div>
       </form>
+
+      <div className="form-card timeline-card">
+        <h3 className="timeline-title">Activity timeline</h3>
+        <p className="hint" style={{ marginBottom: 16 }}>
+          Every stage change is logged automatically. Add your own note for
+          things like a recruiter call or a follow-up email you sent.
+        </p>
+
+        <form className="note-form" onSubmit={handleAddNote}>
+          <input
+            type="text"
+            placeholder="e.g. Sent a follow-up email to the recruiter"
+            value={noteDraft}
+            onChange={(e) => setNoteDraft(e.target.value)}
+            aria-label="Add a timeline note"
+          />
+          <button type="submit" className="btn btn-primary">
+            Add note
+          </button>
+        </form>
+
+        {(!existing.history || existing.history.length === 0) ? (
+          <p className="hint">No activity logged yet.</p>
+        ) : (
+          <ul className="timeline-list">
+            
+            {[...existing.history].reverse().map((entry, i) => (
+              <li className="timeline-item" key={i}>
+                <span className="timeline-dot" />
+                <div>
+                  <div className="timeline-note">{entry.note}</div>
+                  <div className="timeline-date">{formatTimelineDate(entry.date)}</div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </>
   );
 }

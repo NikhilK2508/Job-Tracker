@@ -11,6 +11,7 @@ export default function Stats() {
     count: applications.filter((a) => a.status === stage.id).length,
   }));
 
+  // used for scaling the bar chart widths, min 1 so we dont divide by zero
   const maxCount = Math.max(1, ...counts.map((c) => c.count));
 
   const applied = applications.length;
@@ -19,9 +20,15 @@ export default function Stats() {
   ).length;
   const reachedOffer = applications.filter((a) => a.status === "offer").length;
 
-  const interviewRate = applied ? Math.round((reachedInterview / applied) * 100) : 0;
-  const offerRate = applied ? Math.round((reachedOffer / applied) * 100) : 0;
+  let interviewRate = 0;
+  let offerRate = 0;
+  if (applied > 0) {
+    interviewRate = Math.round((reachedInterview / applied) * 100);
+    offerRate = Math.round((reachedOffer / applied) * 100);
+  }
+
   const followUpCount = applications.filter(needsFollowUp).length;
+  // console.log("stats ->", { applied, reachedInterview, reachedOffer, interviewRate, offerRate });
 
   if (total === 0) {
     return (
@@ -29,6 +36,7 @@ export default function Stats() {
         <h3>No data yet</h3>
         <p>Add a few applications and your stats will show up here.</p>
         <div style={{ marginTop: 18 }}>
+
           <Link to="/add" className="btn btn-primary">
             + Add application
           </Link>
@@ -41,6 +49,7 @@ export default function Stats() {
     <>
       <div className="page-head">
         <span className="eyebrow">Numbers</span>
+        
         <h1 className="page-title">How the search is going</h1>
         <p className="page-sub">
           The honest version of your job search, no vibes — just what
@@ -82,21 +91,25 @@ export default function Stats() {
       <div className="form-card" style={{ maxWidth: "100%" }}>
         <h3 style={{ marginBottom: 22, fontSize: 16 }}>Breakdown by stage</h3>
         <div className="bar-chart">
-          {counts.map((stage) => (
-            <div className="bar-row" key={stage.id}>
-              <div className="bar-label">{stage.label}</div>
-              <div className="bar-track">
-                <div
-                  className="bar-fill"
-                  style={{
-                    width: `${(stage.count / maxCount) * 100}%`,
-                    background: stage.color,
-                  }}
-                />
+          {counts.map((stage) => {
+            // width % for the bar based on which stage has the highest count
+            const widthPct = (stage.count / maxCount) * 100;
+            return (
+              <div className="bar-row" key={stage.id}>
+                <div className="bar-label">{stage.label}</div>
+                <div className="bar-track">
+                  <div
+                    className="bar-fill"
+                    style={{
+                      width: `${widthPct}%`,
+                      background: stage.color,
+                    }}
+                  />
+                </div>
+                <div className="bar-value">{stage.count}</div>
               </div>
-              <div className="bar-value">{stage.count}</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </>
