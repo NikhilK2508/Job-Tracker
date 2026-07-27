@@ -91,7 +91,7 @@ export default function Stats() {
         </div>
       </div>
 
-      <div className="form-card" style={{ maxWidth: "100%" }}>
+      <div className="form-card mb-2" style={{ maxWidth: "100%" }}>
         <h3 style={{ marginBottom: 22, fontSize: 16 }}>Breakdown by stage</h3>
         <div className="bar-chart">
           {counts.map((stage) => {

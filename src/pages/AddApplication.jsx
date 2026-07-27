@@ -81,7 +81,7 @@ export default function AddApplication() {
         </p>
       </div>
 
-      <form className="form-card" onSubmit={handleSubmit} noValidate>
+      <form className="form-card mb-2" onSubmit={handleSubmit} noValidate>
         <div className="field-row">
           <div className="field-group">
             

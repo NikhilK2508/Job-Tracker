@@ -46,7 +46,7 @@ export default function Profile() {
         </p>
       </div>
 
-      <div className="profile-layout">
+      <div className="profile-layout mb-3">
         <form className="form-card" onSubmit={handleSubmit}>
           <div className="field-group">
             <label htmlFor="name">Your name</label>
