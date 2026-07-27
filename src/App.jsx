@@ -11,7 +11,6 @@ import NotFound from "./pages/NotFound.jsx";
 // main app component, sets up navbar + all the routes/pages
 export default function App() {
   
-  // console.log("App component rendered");
 
   return (
     <div className="app-shell">

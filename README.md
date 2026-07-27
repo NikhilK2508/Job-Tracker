@@ -1,4 +1,4 @@
-# Pathway - Job Application Tracker
+# Trackwel - Job Application Tracker
 
 Ye mera submission hai Mini Hackathon ke liye. Basically ek job application
 tracker hai - ek board jaisa jaha pe main dekh sakta hu maine kaha kaha apply
