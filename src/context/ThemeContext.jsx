@@ -36,7 +36,8 @@ export function ThemeProvider({ children }) {
   }, [theme]);
 
   function toggleTheme() {
-    if (theme === "dark") {
+    // console.log("toggling theme, current is", theme)
+    if (theme == "dark") {
       setTheme("light");
     } else {
       setTheme("dark");

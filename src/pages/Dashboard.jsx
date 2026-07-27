@@ -7,24 +7,18 @@ import {
 } from "../context/ApplicationContext.jsx";
 import StageRail from "../components/StageRail.jsx";
 
-// converts "2025-01-05" type string  "Jan 5"
+// turns "2025-01-05" into "Jan 5"
 function formatDate(dateStr) {
-  if (!dateStr) {
-    return "—";
-  }
-  const d = new Date(dateStr + "T00:00:00");
-
+  if (!dateStr) return "—";
+  var d = new Date(dateStr + "T00:00:00");
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 const ALL_STAGE_IDS = STAGES.map((s) => s.id);
-
-// wraps text in quotes for csv, and escapes existing quotes
-
-// (found this rule online, csv breaks if you dont do this for commas/newlines)
+ 
 function csvCell(value) {
-  const str = String(value ?? "");
-  return `"${str.replace(/"/g, '""')}"`;
+  var str = String(value ?? "");
+  return '"' + str.replace(/"/g, '""') + '"';
 }
 
 function exportApplicationsToCSV(applications) {
@@ -64,21 +58,22 @@ function exportApplicationsToCSV(applications) {
 }
 
 export default function Dashboard() {
-  const { applications } = useApplications();
+  const { applications, togglePin } = useApplications();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeStages, setActiveStages] = useState(ALL_STAGE_IDS);
 
   const total = applications.length;
 
-  // counting how many applications are in each category
-  let activeCount = 0;
-  let offerCount = 0;
-  let rejectedCount = 0;
-  for (let i = 0; i < applications.length; i++) {
-    const status = applications[i].status;
-    if (status === "applied" || status === "interview") activeCount++;
-    if (status === "offer") offerCount++;
-    if (status === "rejected") rejectedCount++;
+  // counting how many applications in each bucket, just looping through
+  // once instead of doing 3 separate .filter().length calls
+  var activeCount = 0;
+  var offerCount = 0;
+  var rejectedCount = 0;
+  for (var i = 0; i < applications.length; i++) {
+    var status = applications[i].status;
+    if (status == "applied" || status == "interview") activeCount++;
+    else if (status == "offer") offerCount++;
+    else if (status == "rejected") rejectedCount++;
   }
 
   const followUpCount = applications.filter(needsFollowUp).length;
@@ -202,9 +197,14 @@ export default function Dashboard() {
             <div className="board">
               {STAGES.filter((s) => activeStages.includes(s.id)).map(
                 (stage) => {
-                  const items = filteredApplications.filter(
-                    (a) => a.status === stage.id,
-                  );
+                  const items = filteredApplications
+                    .filter((a) => a.status === stage.id)
+                    .sort((a, b) => {
+                      // pinned wali company hamesha column ke sabse upar
+                      if (a.pinned && !b.pinned) return -1;
+                      if (!a.pinned && b.pinned) return 1;
+                      return 0;
+                    });
                   return (
                     <div className="board-col" key={stage.id}>
                       <div className="board-col-head">
@@ -228,7 +228,9 @@ export default function Dashboard() {
                               to={`/edit/${app.id}`}
                               key={app.id}
                               className={
-                                "app-card" + (flagged ? " needs-followup" : "")
+                                "app-card" +
+                                (flagged ? " needs-followup" : "") +
+                                (app.pinned ? " pinned" : "")
                               }
                             >
                               <div className="app-card-top">
@@ -240,14 +242,43 @@ export default function Dashboard() {
                                     {app.company}
                                   </div>
                                 </div>
-                                {flagged && (
-                                  <span
-                                    className="followup-badge"
-                                    title="No update in 7+ days"
+                                <div className="app-card-actions">
+                                  <button
+                                    type="button"
+                                    className={
+                                      "pin-btn" + (app.pinned ? " active" : "")
+                                    }
+                                    onClick={(e) => {
+                                      // link ke andar button hai isliye
+                                      // navigate hone se rokna padega
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      togglePin(app.id);
+                                    }}
+                                    title={
+                                      app.pinned
+                                        ? "Unpin this application"
+                                        : "Pin this application to top"
+                                    }
                                   >
-                                    ⏰
-                                  </span>
-                                )}
+                                    <i
+                                      className={
+                                        app.pinned
+                                          ? "ri-star-fill"
+                                          : "ri-star-line"
+                                      }
+                                      aria-hidden="true"
+                                    />
+                                  </button>
+                                  {flagged && (
+                                    <span
+                                      className="followup-badge"
+                                      title="No update in 7+ days"
+                                    >
+                                      ⏰
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                               <div className="app-card-date">
                                 Applied {formatDate(app.appliedDate)}

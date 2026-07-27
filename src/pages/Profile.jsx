@@ -11,22 +11,20 @@ export default function Profile() {
   const offerCount = applications.filter((a) => a.status === "offer").length;
   const goal = Number(form.goalOffers) || 0;
 
-
-  // progress bar % (capped at 100 so it doesn't overflow if goal is already crossed)
-  let progressPct = 0;
+  // progress bar %, capping at 100 so bar doesnt overflow past the goal
+  var progressPct = 0;
   if (goal > 0) {
-    progressPct = Math.min(100, Math.round((offerCount / goal) * 100));
+    progressPct = Math.round((offerCount / goal) * 100);
+    if (progressPct > 100) progressPct = 100;
   }
-  
 
   function handleChange(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
-    setSaved(false); // agar user kuch change kare to "Saved" wala tick hata do
+    setSaved(false); // user ne kuch badla, "Saved" tick hata do
   }
 
   function handleSubmit(e) {
     e.preventDefault();
-
 
     updateProfile({
       name: form.name.trim(),
@@ -55,7 +53,7 @@ export default function Profile() {
             <input
               id="name"
               type="text"
-              placeholder="e.g. Aarav Sharma"
+              placeholder="e.g. Raja Sharma"
               value={form.name}
               onChange={(e) => handleChange("name", e.target.value)}
             />
@@ -93,7 +91,11 @@ export default function Profile() {
             <button type="submit" className="btn btn-primary">
               Save profile
             </button>
-            {saved && <span className="hint" style={{ alignSelf: "center" }}>Saved ✓</span>}
+            {saved && (
+              <span className="hint" style={{ alignSelf: "center" }}>
+                Saved ✓
+              </span>
+            )}
           </div>
         </form>
 
@@ -117,7 +119,10 @@ export default function Profile() {
             </span>
           </div>
           <div className="progress-track">
-            <div className="progress-fill" style={{ width: `${progressPct}%` }} />
+            <div
+              className="progress-fill"
+              style={{ width: `${progressPct}%` }}
+            />
           </div>
           <p className="hint" style={{ marginTop: 10 }}>
             {offerCount >= goal && goal > 0

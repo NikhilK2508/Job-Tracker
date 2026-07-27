@@ -8,10 +8,8 @@ import Stats from "./pages/Stats.jsx";
 import Profile from "./pages/Profile.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
-// main app component, sets up navbar + all the routes/pages
+// main app component - navbar on top, then whichever page matches the route
 export default function App() {
-  
-
   return (
     <div className="app-shell">
       <Navbar />

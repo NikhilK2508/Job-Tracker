@@ -11,8 +11,11 @@ export default function Stats() {
     count: applications.filter((a) => a.status === stage.id).length,
   }));
 
-  // used for scaling the bar chart widths, min 1 so we dont divide by zero
-  const maxCount = Math.max(1, ...counts.map((c) => c.count));
+  // for scaling bar widths, min 1 so we dont divide by 0 when list is empty
+  var maxCount = 1;
+  for (const c of counts) {
+    if (c.count > maxCount) maxCount = c.count;
+  }
 
   const applied = applications.length;
   const reachedInterview = applications.filter((a) =>

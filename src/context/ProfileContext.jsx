@@ -56,10 +56,8 @@ export function ProfileProvider({ children }) {
   }, [profile]);
 
   function updateProfile(updates) {
-    setProfile((prev) => {
-
-      return { ...prev, ...updates };
-    });
+    // console.log("updating profile with", updates)
+    setProfile((prev) => ({ ...prev, ...updates }));
   }
 
   return (

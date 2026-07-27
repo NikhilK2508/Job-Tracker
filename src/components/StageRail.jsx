@@ -8,13 +8,9 @@ const FUNNEL_ORDER = ["applied", "interview", "offer"];
 export default function StageRail({ status }) {
   const isRejected = status === "rejected";
 
-  let currentIndex;
-  if (isRejected) {
-    // show full progress bar (till offer step) even if rejected
-    currentIndex = FUNNEL_ORDER.length - 1;
-  } else {
-    currentIndex = FUNNEL_ORDER.indexOf(status);
-  }
+  // if rejected we still show the bar as fully filled till offer step,
+  // looks weird otherwise since rejected isnt really "after" offer
+  var currentIndex = isRejected ? FUNNEL_ORDER.length - 1 : FUNNEL_ORDER.indexOf(status);
 
   return (
     <div className="stage-rail" aria-label={`Pipeline progress: ${status}`}>

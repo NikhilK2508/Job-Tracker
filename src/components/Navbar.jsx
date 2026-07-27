@@ -19,6 +19,7 @@ export default function Navbar() {
 
   function handleMenuToggle() {
     setMenuOpen((prev) => !prev);
+    // console.log('menu toggled, prev was', menuOpen)
   }
 
   return (
@@ -64,7 +65,12 @@ export default function Navbar() {
             <button
               type="button"
               className="theme-toggle"
-              onClick={toggleTheme}
+              onClick={() => {
+                toggleTheme();
+                // menu khula reh jata tha theme change karne ke baad, isliye
+                // yaha bhi manually band kar rahe (same jaisa route change pe hota hai)
+                setMenuOpen(false);
+              }}
               aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
               title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
             >

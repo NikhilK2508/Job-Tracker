@@ -7,8 +7,8 @@ import {
   needsFollowUp,
 } from "../context/ApplicationContext.jsx";
 
-// same validation function as AddApplication.jsx
-// (should probably move this to a shared file someday but this works for now)
+// same validation as AddApplication.jsx basically, copy pasted from there
+// TODO: move to a shared utils file, this is kinda duplicated rn
 function validate(form) {
   const errors = {};
   if (!form.company.trim()) errors.company = "Company name is required.";
@@ -86,11 +86,11 @@ export default function EditApplication() {
   // delete button needs to be clicked twice - first click just asks
   // for confirmation, second click actually deletes
   function handleDelete() {
-    if (!confirmingDelete) {
+    if (confirmingDelete == false) {
       setConfirmingDelete(true);
       return;
     }
-
+    // console.log("deleting application", id)
     deleteApplication(id);
     navigate("/");
   }

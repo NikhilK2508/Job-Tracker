@@ -11,21 +11,21 @@ const EMPTY_FORM = {
   notes: "",
 };
 
-// checks the form and returns an object with error messages
-// (empty object means no errors)
+// checks the form, returns object with error msgs (empty obj = no errors)
 function validate(form) {
-  const errors = {};
+  let errors = {};
 
-  if (!form.company.trim()) {
+  if (form.company.trim() == "") {
     errors.company = "Company name is required.";
   }
-  if (!form.role.trim()) {
+  if (form.role.trim() == "") {
     errors.role = "Role title is required.";
   }
   if (!form.appliedDate) {
     errors.appliedDate = "Pick the date you applied.";
   }
-  if (form.link.trim() && !/^https?:\/\/.+/i.test(form.link.trim())) {
+  // link is optional, only validate if user actually typed something
+  if (form.link.trim() != "" && !/^https?:\/\/.+/i.test(form.link.trim())) {
     errors.link = "Link should start with http:// or https://";
   }
 
@@ -53,10 +53,10 @@ export default function AddApplication() {
     const validationErrors = validate(form);
     setErrors(validationErrors);
     setTouched({ company: true, role: true, appliedDate: true, link: true });
+    // console.log("errors are", validationErrors)
 
-    // agar koi bhi error hai to yahi ruk jao, aage mat badho
     if (Object.keys(validationErrors).length > 0) {
-      return;
+      return; // ruk jao, aage mat badho
     }
 
     const id = addApplication({
